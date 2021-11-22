@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
 
-function App() {
+import "./styles/App.css";
+
+const App = () => {
+  // Render Methods
+  const renderNotConnectedContainer = () => (
+    <button className="cta-button connect-wallet-button">
+      Connect to Wallet
+    </button>
+  );
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="container">
+        <div className="header-container">
+          <p className="header gradient-text">My NFT Collection</p>
+          <p className="sub-text">
+            Each unique. Each beautiful. Discover your NFT today.
+          </p>
+          {renderNotConnectedContainer()}
+        </div>
+        <div className="footer-container">
+          <a
+            className="footer-text"
+            href="https://eneaxharja.com"
+            target="_blank"
+            rel="noreferrer"
+          >
+            © {new Date().getFullYear()} Enea Xharja
+          </a>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default App;

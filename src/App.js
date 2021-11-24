@@ -9,33 +9,6 @@ const App = () => {
   // State variable we use to store our user's public wallet
   const [currentAccount, setCurrentAccount] = React.useState("");
 
-  const checkIfWalletIsConnected = async () => {
-    // Make sure we have access to window.ethereum
-    const { ethereum } = window;
-
-    if (!ethereum) {
-      console.log("Make sure you have Metamask!");
-      return;
-    } else {
-      console.log("We have the ethereum object", ethereum);
-    }
-
-    // Check if we're authorized to access the user's wallet
-    const accounts = await ethereum.request({ method: "eth_accounts" });
-
-    // User can have multiple authorized accounts, we grab the first one if its there
-    if (accounts.length !== 0) {
-      const account = accounts[0];
-      console.log("Found an authorized account:", account);
-      setCurrentAccount(account);
-
-      // Setup listener! In case a user ALREADY had their wallet connected + authorized
-      setupEventListener();
-    } else {
-      console.log("No authorized account found");
-    }
-  };
-
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -124,6 +97,33 @@ const App = () => {
   };
 
   React.useEffect(() => {
+    const checkIfWalletIsConnected = async () => {
+      // Make sure we have access to window.ethereum
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        console.log("Make sure you have Metamask!");
+        return;
+      } else {
+        console.log("We have the ethereum object", ethereum);
+      }
+
+      // Check if we're authorized to access the user's wallet
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+
+      // User can have multiple authorized accounts, we grab the first one if its there
+      if (accounts.length !== 0) {
+        const account = accounts[0];
+        console.log("Found an authorized account:", account);
+        setCurrentAccount(account);
+
+        // Setup listener! In case a user ALREADY had their wallet connected + authorized
+        setupEventListener();
+      } else {
+        console.log("No authorized account found");
+      }
+    };
+
     checkIfWalletIsConnected();
   }, []);
 

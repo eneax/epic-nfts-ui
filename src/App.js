@@ -8,6 +8,7 @@ import myEpicNft from "./utils/MyEpicNFT.json";
 const App = () => {
   // State variable we use to store our user's public wallet
   const [currentAccount, setCurrentAccount] = React.useState("");
+  const [totalMintCount, setTotalMintCount] = React.useState(0);
 
   const connectWallet = async () => {
     try {
@@ -28,6 +29,7 @@ const App = () => {
       setCurrentAccount(accounts[0]);
 
       // Setup listener! In case where a user connected their wallet for the first time
+      setupEventListener();
     } catch (error) {
       console.log(error);
     }
@@ -46,6 +48,15 @@ const App = () => {
           myEpicNft.abi,
           signer
         );
+
+        const chainId = await ethereum.request({ method: "eth_chainId" });
+        console.log("Connected to chain " + chainId);
+
+        // String, hex code of the chainId of the Rinkeby test network
+        const rinkebyChainId = "0x4";
+        if (chainId !== rinkebyChainId) {
+          alert("You are not connected to the Rinkeby Test Network!");
+        }
 
         // Capture event when contract throws it
         connectedContract.on("NewEpicNFTMinted", (from, tokenId) => {
@@ -85,9 +96,37 @@ const App = () => {
         console.log("Mining...please wait.");
         await nftTransaction.wait();
 
+        let totalMinted = await connectedContract.getTotalNFTsMintedSoFar();
+        setTotalMintCount(totalMinted);
+
         console.log(
           `Mined, see transaction: https://rinkeby.etherscan.io/tx/${nftTransaction.hash}`
         );
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getTotalNFTsMintedSoFar = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const connectedContract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          myEpicNft.abi,
+          signer
+        );
+
+        console.log("Going to pop wallet now to pay gas...");
+        let totalMinted = await connectedContract.getTotalNFTsMintedSoFar();
+        setTotalMintCount(totalMinted);
+        console.log(`Total NFTs Minted: ${totalMinted}`);
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -125,6 +164,7 @@ const App = () => {
     };
 
     checkIfWalletIsConnected();
+    getTotalNFTsMintedSoFar();
   }, []);
 
   // Render Methods
@@ -154,6 +194,9 @@ const App = () => {
           <p className="sub-text">
             Each unique. Each beautiful. Discover your NFT today.
           </p>
+          <p className="gradient-text">
+            {Number(totalMintCount)}/50 NFTs minted so far
+          </p>
           {currentAccount === ""
             ? renderNotConnectedContainer()
             : renderMintUI()}
@@ -161,11 +204,11 @@ const App = () => {
         <div className="footer-container">
           <a
             className="footer-text"
-            href="https://eneaxharja.com"
+            href="https://testnets.opensea.io/collection/squarenft-yunfx0g2ar"
             target="_blank"
             rel="noreferrer"
           >
-            © {new Date().getFullYear()} Enea Xharja
+            🌊 View Collection on OpenSea
           </a>
         </div>
       </div>
